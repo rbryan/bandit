@@ -15,13 +15,13 @@
 		(connect sock AF_INET dst port)
 		sock))
 
-(define (netread sock buf)
-	(let ((n (recv! sock buf)))
-		(string-take (utf8->string buf) n)))
+;(define (netread sock buf)
+;	(let ((n (recv! sock buf)))
+;		(string-take (utf8->string buf) n)))
 
-(define (NRhost sock buf)
-	(display (eval-string (netread sock buf)) sock))
+(define (NRhost sock)
+	(write (primitive-eval (read sock)) sock))
 
-(define (NRclient sock buf str)
-	(send sock (string->utf8 str))
-	(netread sock buf))
+(define (NRclient sock str)
+	(write str sock)
+	(read sock))
