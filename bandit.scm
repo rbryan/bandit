@@ -14,19 +14,19 @@
 
 (define (all l) (fold (lambda (x y) (and x y)) #t l))
 
-(define (repl)
-  (let loop ((listener-ports (get-listener-ports 2 9090)))
+(define (repl port)
+  (let loop ((listener-ports (get-listener-ports 2 port)))
 	  (let ((ports (select listener-ports '() '() #f)))
 	    ;(format #t "Debug: ~a\n" ports)
 	    (if (all (map (lambda (port)
 		    (catch #t 
 			   ;(lambda () (format (cdr port) "~a\n" (eval (read (car port)) (interaction-environment))) #t)
-			   (lambda () (format port "~a\n" (primitive-eval (read port))) (read-char port) #t)
+			   (lambda () (let ((expr (read port))) (read-char port) (format port "~a\n" (primitive-eval expr))) #t)
 			   (lambda (key . args) 
 			     (if (eq? key 'quit)
 			       #f
 			       (begin
-				 (display args) #t))))
+				 (format port "~a\n" args) #t))))
 		   )
 		 (car ports)))
 	    (loop listener-ports)
