@@ -1,4 +1,4 @@
-(use-modules (rnrs io ports))
+(use-modules (rnrs io ports) (srfi srfi-1))
 
 (define (get-listener-ports n port)
   (let ((sock-port (socket PF_INET SOCK_STREAM 0)))
@@ -12,10 +12,6 @@
   )
 )
 
-(define (fold lam v l)
-	(if (null? l) v
-	 (fold lam (lam v (car l)) (cdr l))))
-
 (define (all l) (fold (lambda (x y) (and x y)) #t l))
 
 (define (repl)
@@ -23,9 +19,6 @@
 	  (let ((ports (select listener-ports '() '() #f)))
 	    ;(format #t "Debug: ~a\n" ports)
 	    (if (all (map (lambda (port)
-		   #| let ((port (if (equal? input-port (fdes->inport 1))
-				       (cons (fdes->inport 1) (fdes->outport 1))
-				       (cons input-port input-port))))|#
 		    (catch #t 
 			   ;(lambda () (format (cdr port) "~a\n" (eval (read (car port)) (interaction-environment))) #t)
 			   (lambda () (format port "~a\n" (primitive-eval (read port))) (read-char port) #t)
